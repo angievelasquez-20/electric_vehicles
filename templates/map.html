@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mapa de Resultados</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/
+bootstrap.min.css">
+</head>
+<body class="p-4">
+<h2>Ubicaciones Recomendadas</h2>
+<div class="row">
+<div class="col-md-8">
+{{ mapa|safe }}
+</div>
+<div class="col-md-4">
+<ul class="list-group">
+{% for lat, lon in estaciones %}
+<li class="list-group-item">
+<strong>Lat:</strong> {{ lat|round(4) }} | <strong>Lon:</strong>
+{{ lon|round(4) }}
+</li>
+{% endfor %}
+</ul>
+<a href="/" class="btn btn-secondary mt-3">Volver</a>
+</div>
+</div>
+</body>
+</html>
