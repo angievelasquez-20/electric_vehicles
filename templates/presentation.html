@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electric Vehicles and Charging Stations in Colombia</title>
+    <!-- Bootstrap 5 CDN for quick responsive design -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <!-- Main Header -->
+    <header class="hero-section text-center shadow">
+        <div class="container">
+            <h1 class="display-4 fw-bold">Electric Mobility in Colombia</h1>
+            <p class="lead">Charging infrastructure, connector types, and key deployment points across the national territory.</p>
+        </div>
+    </header>
+
+    <main class="container mb-5">
+        
+        <!-- Section 1: Electric Vehicle & Charging Infrastructure Information -->
+        <section class="mb-5">
+            <h2 class="text-success mb-4 fw-semibold">Infrastructure and Charging Levels</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card card-custom h-100 p-4">
+                        <h4 class="text-dark">Level 1: Slow Charging</h4>
+                        <p class="text-muted">Uses alternating current (AC) with a standard household outlet (110V). Ideal for emergencies, electric motorcycles, or e-scooters. A full car charge takes between 12 to 20 hours.</p>
+                        <span class="badge bg-secondary p-2 mt-auto">Domestic</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-custom h-100 p-4">
+                        <h4 class="text-dark">Level 2: Medium Charging</h4>
+                        <p class="text-muted">Alternating current (AC) at 220V. This is the most common standard in properly equipped households, shopping malls (Unicentro, Andino, Santafé), and public parking lots. Takes 4 to 8 hours.</p>
+                        <span class="badge badge-medium p-2 mt-auto">Commercial / Residential</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-custom h-100 p-4">
+                        <h4 class="text-dark">Level 3: Fast Charging</h4>
+                        <p class="text-muted">Direct current (DC). These high-power charging stations allow vehicles to reach up to an 80% charge in a 20 to 45-minute window. Essential for intercity highway travel.</p>
+                        <span class="badge badge-fast p-2 mt-auto">Highway Charging Hubs</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Charging Stations Table in Colombia -->
+        <section class="mb-5">
+            <h2 class="text-success mb-4 fw-semibold">Key Charging Locations</h2>
+            <p class="text-muted">Colombia is advancing toward full network interoperability (Terpel Voltex, EPM, Enel X, Celsia, Evsy). The main urban areas and charging hubs are listed below:</p>
+            
+            <div class="table-container table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>City / Region</th>
+                            <th>Location / Reference Point</th>
+                            <th>Primary Operator</th>
+                            <th>Charging Type Available</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Bogotá D.C.</strong></td>
+                            <td>Andino Mall, Santafé Mall, Transport Terminal, Modelia, Alhambra</td>
+                            <td>Enel X / Terpel Voltex</td>
+                            <td><span class="badge bg-warning text-dark">Medium</span> <span class="badge bg-danger">Fast</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Medellín / Antioquia</strong></td>
+                            <td>Santafé Mall, EPM Parking Lot, Rionegro Airport, Envigado, Sabaneta</td>
+                            <td>EPM / Celsia</td>
+                            <td><span class="badge bg-warning text-dark">Medium</span> <span class="badge bg-danger">Fast</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cali / Valle del Cauca</strong></td>
+                            <td>Unicentro Mall, Cali-Jamundí Highway Corridor</td>
+                            <td>Celsia</td>
+                            <td><span class="badge bg-warning text-dark">Medium</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Coffee Axis (Eje Cafetero)</strong></td>
+                            <td>Pereira, Armenia, Manizales (Urban hubs and gas stations)</td>
+                            <td>CHEC / EDEQ / Terpel</td>
+                            <td><span class="badge bg-warning text-dark">Medium</span> <span class="badge bg-danger">Fast</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cundinamarca (Sabana Area)</strong></td>
+                            <td>Chía, Soacha, Villeta (Ruta del Sol Highway)</td>
+                            <td>Enel X / Terpel Voltex</td>
+                            <td><span class="badge bg-warning text-dark">Medium</span> <span class="badge bg-danger">Fast</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>The Santanderean Region</strong></td>
+                            <td>Bucaramanga, Cúcuta (Commercial areas)</td>
+                            <td>ESSA / Celsia</td>
+                            <td><span class="badge bg-warning text-dark">Medium</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section 3: Legal Note / Current Regulations -->
+        <section class="bg-light p-4 rounded-3 border-start border-success border-4 shadow-sm">
+            <h4 class="fw-bold text-dark text-uppercase small tracking-wider">💡 Key Regulatory Insight for Colombia</h4>
+            <p class="mb-0 text-muted">
+                Under the Horizontal Property Law (Ley de Propiedad Horizontal) and current energy safety updates, installing private EV chargers in gated communities, condos, or residential buildings requires a formal electrical technical feasibility study and explicit approval from the co-owners' assembly to ensure grid stability.
+            </p>
+        </section>
+
+    </main>
+    <a href="/" class="btn btn-secondary mt-3">Back</a>
+    <a href="/index" class="btn btn-secondary mt-3">Next</a>
+</body>
+</html>
