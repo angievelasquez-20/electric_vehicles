@@ -10,8 +10,8 @@ def home():
 def index():
     return render_template('index.html')
 
-@app.route('/recomendar', methods=['GET', 'POST'])
-def recomendar():
+@app.route('/Recommend', methods=['GET', 'POST'])
+def Recommend():
     if request.method == 'POST':
         try:
             n_estaciones = int(request.form.get('n_estaciones', 5))
