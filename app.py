@@ -10,6 +10,10 @@ def home():
 def index():
     return render_template('index.html')
 
+@app.route('/presentation')
+def presentation():
+    return render_template('presentation.html')
+
 @app.route('/Recommend', methods=['GET', 'POST'])
 def Recommend():
     if request.method == 'POST':
