@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request
 import logic
+from regression import train_regression_model
+
 app = Flask(__name__)
 
 @app.route('/')
@@ -20,6 +22,19 @@ def recomendar():
         except Exception as e:
             return f"Error: {str(e)}", 500
     return render_template('index.html')
+
+@app.route('/regression')
+def regression():
+    try:
+        model, results = train_regression_model()
+
+        return render_template(
+            'regression.html',
+            results=results
+        )
+
+    except Exception as e:
+        return f"Linear regression error: {str(e)}", 500
 
 if __name__ == '__main__':
     app.run(debug=True)
