@@ -1,12 +1,9 @@
 from flask import Flask, render_template, request
 import logic
+from regression import train_regression_model
 import os
 
 app = Flask(__name__)
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
 
 @app.route('/')
 def home():
@@ -31,5 +28,19 @@ def Recommend():
             return f"Error: {str(e)}", 500
     return render_template('index.html')
 
-if __name__ == '__main__':
-    app.run(debug=True)
+@app.route('/regression')
+def regression():
+    try:
+        model, results = train_regression_model()
+
+        return render_template(
+            'regression.html',
+            results=results
+        )
+
+    except Exception as e:
+        return f"Linear regression error: {str(e)}", 500
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)
