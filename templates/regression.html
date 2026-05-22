@@ -146,6 +146,30 @@
       <div class="col-lg-5">
         <div class="card shadow-sm border-0 h-100">
           <div class="card-header bg-dark text-white">
+            Regression Charts
+          </div>
+
+          <div class="card-body">
+            <h6 class="fw-bold">Actual vs Predicted</h6>
+            <img
+              src="{{ url_for('static', filename=results.prediction_plot) }}"
+              class="img-fluid rounded border mb-4"
+              alt="Actual vs predicted energy drawn chart"
+            >
+
+            <h6 class="fw-bold">Residual Errors</h6>
+            <img
+              src="{{ url_for('static', filename=results.residual_plot) }}"
+              class="img-fluid rounded border"
+              alt="Regression residual errors chart"
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-header bg-dark text-white">
             Interpretation
           </div>
 
