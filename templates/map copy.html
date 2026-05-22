@@ -9,11 +9,11 @@ bootstrap.min.css">
 <h2>Recommended Locations</h2>
 <div class="row">
 <div class="col-md-8">
-{{ mapa|safe }}
+{{ map|safe }}
 </div>
 <div class="col-md-4">
 <ul class="list-group">
-{% for lat, lon in estaciones %}
+{% for lat, lon in stations %}
 <li class="list-group-item">
 <strong>Lat:</strong> {{ lat|round(4) }} | <strong>Lon:</strong>
 {{ lon|round(4) }}
