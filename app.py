@@ -1,13 +1,15 @@
-from flask import Flask, render_template, request, session, redirect, url_for, flash
-from flask_session import Session
-import logic
-from regression import train_regression_model
-import auth_ad
-from kmeans import applyClusteringKmeans, generate_plot
 import os
 import shutil
 import signal
 import atexit
+
+from flask import Flask, flash, redirect, render_template, request, session, url_for
+from flask_session import Session
+
+import auth_ad
+import logic
+from kmeans import applyClusteringKmeans, generate_plot
+from regression import train_regression_model
 
 app = Flask(__name__)
 app.secret_key = 'tu_clave_secreta_para_sesiones' # Required for using sessions
