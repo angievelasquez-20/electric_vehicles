@@ -83,7 +83,7 @@ def regression():
 def login():
     # If already logged in, go directly to the optimizer
     if 'user' in session:
-        return redirect(url_for('optimizer'))
+        return redirect(url_for('presentation'))
     return render_template('login.html')
 
 @app.route('/login_process', methods=['POST'])
@@ -95,7 +95,7 @@ def login_process():
     if auth_ad.authenticate_ad_user(username, password):
         session.permanent = False
         session['user'] = username  # store the session
-        return redirect(url_for('optimizer'))
+        return redirect(url_for('presentation'))
     else:
         flash('Active Directory credentials are incorrect or server unavailable.', 'danger')
         return redirect(url_for('login'))

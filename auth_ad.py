@@ -6,7 +6,7 @@ DOMAIN_SUFFIX = '@lab.local'  # Active Directory domain suffix
 
 def authenticate_ad_user(username, password):
     # --- LOCAL TEST MODE (for when the Windows Server is offline) ---
-    if username == "admin.test" and password == "Cesar123":
+    if username == "admin.test" and password == "Machine123":
         print("Access granted using local test user.")
         return True
     # -----------------------------------------------------------------
