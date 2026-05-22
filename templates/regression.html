@@ -3,85 +3,56 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Linear Regression Analysis</title>
-
+  <title>Energy Prediction</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-
 <body class="bg-light">
-
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
       <a class="navbar-brand" href="/">EV Charging Stations Colombia</a>
-
       <div class="navbar-nav ms-auto">
-        <a class="nav-link" href="/">Home</a>
-        <a class="nav-link" href="/recommend">Recommendation</a>
-        <a class="nav-link active" href="/regression">Linear Regression</a>
+        <a class="nav-link" href="/index">Recommendation</a>
+        <a class="nav-link active" href="/regression">Energy Predict</a>
       </div>
     </div>
   </nav>
 
   <main class="container py-5">
-
-    <div class="text-center mb-5">
-      <h1 class="fw-bold">Linear Regression Analysis</h1>
-      <p class="text-muted">
-        Prediction model for estimating energy drawn during EV charging sessions
-        based on vehicle, station, traffic, and weather data.
-      </p>
+    <div class="text-center mb-4">
+      <h1 class="fw-bold">Energy Prediction</h1>
+      <p class="text-muted mb-0">Enter the main charging conditions and estimate the energy drawn.</p>
     </div>
 
     <div class="row g-4 mb-4">
-
-      <div class="col-md-3">
+      <div class="col-md-4">
         <div class="card shadow-sm border-0 h-100">
           <div class="card-body text-center">
-            <h6 class="text-muted">Target Variable</h6>
-            <h5 class="fw-bold">{{ results.target }}</h5>
-            <p class="small text-muted mb-0">Value predicted by the model</p>
+            <h6 class="text-muted">Target</h6>
+            <h5 class="fw-bold mb-0">{{ results.target }}</h5>
           </div>
         </div>
       </div>
-
-      <div class="col-md-3">
-        <div class="card shadow-sm border-0 h-100">
-          <div class="card-body text-center">
-            <h6 class="text-muted">R2 Score</h6>
-            <h3 class="fw-bold text-primary">{{ results.r2_score }}</h3>
-            <p class="small text-muted mb-0">Model explanation level</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-3">
-        <div class="card shadow-sm border-0 h-100">
-          <div class="card-body text-center">
-            <h6 class="text-muted">Mean Absolute Error</h6>
-            <h3 class="fw-bold text-danger">{{ results.mean_absolute_error }}</h3>
-            <p class="small text-muted mb-0">Average prediction error</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-3">
+      <div class="col-md-4">
         <div class="card shadow-sm border-0 h-100">
           <div class="card-body text-center">
             <h6 class="text-muted">Clean Records</h6>
-            <h3 class="fw-bold text-success">{{ results.clean_records }}</h3>
-            <p class="small text-muted mb-0">Rows used for training</p>
+            <h3 class="fw-bold text-success mb-0">{{ results.clean_records }}</h3>
           </div>
         </div>
       </div>
-
+      <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-body text-center">
+            <h6 class="text-muted">Average Error</h6>
+            <h3 class="fw-bold text-danger mb-0">{{ results.mean_absolute_error }}</h3>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="card shadow-sm border-0 mb-4">
-      <div class="card-header bg-dark text-white">
-        Energy Prediction Form
-      </div>
-
+      <div class="card-header bg-dark text-white">Prediction Form</div>
       <div class="card-body">
         <form action="/regression" method="post">
           <div class="row g-3">
@@ -107,7 +78,7 @@
           </div>
         </form>
 
-        {% if prediction is not none %}
+        {% if show_graphs %}
           <div class="alert alert-success mt-4 mb-0">
             <strong>Predicted Energy Drawn:</strong> {{ prediction }} kWh
           </div>
@@ -115,185 +86,154 @@
       </div>
     </div>
 
-    <div class="row g-4">
-
-      <div class="col-lg-7">
-
-        <div class="card shadow-sm border-0 mb-4">
-          <div class="card-header bg-primary text-white">
-            Training Results
+    {% if show_graphs %}
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-dark text-white">Actual vs Predicted</div>
+            <div class="card-body">
+              <img
+                src="{{ url_for('static', filename=results.prediction_plot) }}"
+                class="img-fluid rounded border"
+                alt="Actual vs predicted energy drawn chart"
+              >
+            </div>
           </div>
+        </div>
 
+        <div class="col-lg-6">
+          <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-dark text-white">Residual Errors</div>
+            <div class="card-body">
+              <img
+                src="{{ url_for('static', filename=results.residual_plot) }}"
+                class="img-fluid rounded border"
+                alt="Regression residual errors chart"
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <div class="alert alert-info shadow-sm">
+        Charts will appear after running the prediction.
+      </div>
+    {% endif %}
+
+    <div class="row g-4 mt-1">
+      <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-header bg-primary text-white">Training Results</div>
           <div class="card-body">
             <p><strong>Original records:</strong> {{ results.original_records }}</p>
             <p><strong>Clean records:</strong> {{ results.clean_records }}</p>
             <p><strong>Removed records:</strong> {{ results.removed_records }}</p>
             <p><strong>R2 Score:</strong> {{ results.r2_score }}</p>
-            <p><strong>Mean Absolute Error:</strong> {{ results.mean_absolute_error }}</p>
-          </div>
-        </div>
-
-        <div class="card shadow-sm border-0 mb-4">
-          <div class="card-header bg-dark text-white">
-            Model Comparison
-          </div>
-
-          <div class="card-body">
-            <p class="text-muted">
-              The table compares several regression models using the same
-              training and test split. The best model is selected by the lowest
-              Mean Absolute Error.
-            </p>
-
-            <div class="table-responsive">
-              <table class="table table-hover align-middle">
-                <thead class="table-light">
-                  <tr>
-                    <th>Model</th>
-                    <th>R2 Score</th>
-                    <th>Mean Absolute Error</th>
-                    <th>RMSE</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {% for model in results.model_comparison %}
-                    <tr>
-                      <td class="fw-semibold">{{ model.name }}</td>
-                      <td>{{ model.r2_score }}</td>
-                      <td>{{ model.mean_absolute_error }}</td>
-                      <td>{{ model.root_mean_squared_error }}</td>
-                      <td>
-                        {% if model.is_best %}
-                          <span class="badge bg-success">Best model</span>
-                        {% else %}
-                          <span class="badge bg-secondary">Compared</span>
-                        {% endif %}
-                      </td>
-                    </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-
-            <div class="alert alert-info mb-0">
-              <strong>Best model:</strong> {{ results.best_model }}
-            </div>
-          </div>
-        </div>
-
-        <div class="card shadow-sm border-0 h-100">
-          <div class="card-header bg-primary text-white">
-            Model Overview
-          </div>
-
-          <div class="card-body">
-            <p>
-              This linear regression model estimates the expected energy drawn
-              for electric vehicle charging sessions. The prediction is based on
-              numerical variables from the dataset such as battery capacity,
-              state of charge, distance to destination, queue time, station
-              capacity, weather conditions, and fleet information.
-            </p>
-
-            <h6 class="fw-bold mt-4">Input Features</h6>
-
-            <div class="row">
-              <div class="col-md-6">
-                <ul class="list-group list-group-flush">
-                  <li class="list-group-item">Battery Capacity</li>
-                  <li class="list-group-item">State of Charge</li>
-                  <li class="list-group-item">Energy Consumption Rate</li>
-                  <li class="list-group-item">Distance to Destination</li>
-                  <li class="list-group-item">Traffic Data</li>
-                  <li class="list-group-item">Charging Rate</li>
-                  <li class="list-group-item">Queue Time</li>
-                  <li class="list-group-item">Station Capacity</li>
-                </ul>
-              </div>
-
-              <div class="col-md-6">
-                <ul class="list-group list-group-flush">
-                  <li class="list-group-item">Energy Drawn</li>
-                  <li class="list-group-item">Session Start Hour</li>
-                  <li class="list-group-item">Fleet Size</li>
-                  <li class="list-group-item">Temperature</li>
-                  <li class="list-group-item">Wind Speed</li>
-                  <li class="list-group-item">Precipitation</li>
-                  <li class="list-group-item">Weekday</li>
-                </ul>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-
-      <div class="col-lg-5">
-        <div class="card shadow-sm border-0 h-100">
-          <div class="card-header bg-dark text-white">
-            Regression Charts
-          </div>
-
-          <div class="card-body">
-            <h6 class="fw-bold">Actual vs Predicted</h6>
-            <img
-              src="{{ url_for('static', filename=results.prediction_plot) }}"
-              class="img-fluid rounded border mb-4"
-              alt="Actual vs predicted energy drawn chart"
-            >
-
-            <h6 class="fw-bold">Residual Errors</h6>
-            <img
-              src="{{ url_for('static', filename=results.residual_plot) }}"
-              class="img-fluid rounded border"
-              alt="Regression residual errors chart"
-            >
+            <p class="mb-0"><strong>Mean Absolute Error:</strong> {{ results.mean_absolute_error }}</p>
           </div>
         </div>
       </div>
 
-      <div class="col-lg-5">
+      <div class="col-lg-6">
         <div class="card shadow-sm border-0 h-100">
-          <div class="card-header bg-dark text-white">
-            Interpretation
-          </div>
-
+          <div class="card-header bg-dark text-white">Interpretation</div>
           <div class="card-body">
             <div class="alert alert-primary">
-              <strong>R2 Score</strong> shows how much of the variation in
-              energy drawn is explained by the model.
+              <strong>R2 Score</strong> shows how much of the variation in energy drawn is explained by the model.
             </div>
-
             <div class="alert alert-danger">
-              <strong>Mean Absolute Error</strong> shows the average difference
-              between the predicted energy drawn and the real energy drawn.
+              <strong>Mean Absolute Error</strong> shows the average difference between the predicted energy drawn and the real energy drawn.
             </div>
-
-            <div class="alert alert-success">
-              This model can support the recommendation system by estimating
-              areas or conditions with higher expected energy demand.
+            <div class="alert alert-success mb-0">
+              This model can support the recommendation system by estimating areas or conditions with higher expected energy demand.
             </div>
-
-            <h6 class="fw-bold mt-4">Project Use</h6>
-            <p class="mb-0">
-              The regression result helps prioritize charging station planning.
-              While the map recommends possible locations, the regression model
-              helps estimate how much energy a charging session may require.
-            </p>
           </div>
         </div>
       </div>
-
     </div>
 
-    <div class="mt-4 d-flex gap-2">
-      <button type="button" class="btn btn-secondary" onclick="history.back()">Back</button>
-      <a href="/K_means" class="btn btn-primary">Next</a>
+    <div class="card shadow-sm border-0 mt-4">
+      <div class="card-header bg-dark text-white">Model Comparison</div>
+      <div class="card-body">
+        <p class="text-muted">
+          The table compares several regression models using the same training and test split.
+          The best model is selected by the lowest Mean Absolute Error.
+        </p>
+
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Model</th>
+                <th>R2 Score</th>
+                <th>Mean Absolute Error</th>
+                <th>RMSE</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for model in results.model_comparison %}
+                <tr>
+                  <td class="fw-semibold">{{ model.name }}</td>
+                  <td>{{ model.r2_score }}</td>
+                  <td>{{ model.mean_absolute_error }}</td>
+                  <td>{{ model.root_mean_squared_error }}</td>
+                  <td>
+                    {% if model.is_best %}
+                      <span class="badge bg-success">Best model</span>
+                    {% else %}
+                      <span class="badge bg-secondary">Compared</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="alert alert-info mb-0">
+          <strong>Best model:</strong> {{ results.best_model }}
+        </div>
+      </div>
     </div>
 
+    <div class="card shadow-sm border-0 mt-4">
+      <div class="card-header bg-primary text-white">Model Overview</div>
+      <div class="card-body">
+        <p>
+          This linear regression model estimates the expected energy drawn for electric vehicle charging sessions.
+          The prediction is based on numerical variables from the dataset such as battery capacity, state of charge,
+          distance to destination, queue time, station capacity, weather conditions, and fleet information.
+        </p>
+
+        <h6 class="fw-bold mt-4">Input Features</h6>
+        <div class="row">
+          <div class="col-md-6">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">Battery Capacity</li>
+              <li class="list-group-item">State of Charge</li>
+              <li class="list-group-item">Energy Consumption Rate</li>
+              <li class="list-group-item">Distance to Destination</li>
+              <li class="list-group-item">Traffic Data</li>
+              <li class="list-group-item">Charging Rate</li>
+              <li class="list-group-item">Queue Time</li>
+              <li class="list-group-item">Station Capacity</li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">Energy Drawn</li>
+              <li class="list-group-item">Session Start Hour</li>
+              <li class="list-group-item">Fleet Size</li>
+              <li class="list-group-item">Temperature</li>
+              <li class="list-group-item">Wind Speed</li>
+              <li class="list-group-item">Precipitation</li>
+              <li class="list-group-item">Weekday</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 </body>
 </html>
