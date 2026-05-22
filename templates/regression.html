@@ -95,6 +95,56 @@
           </div>
         </div>
 
+        <div class="card shadow-sm border-0 mb-4">
+          <div class="card-header bg-dark text-white">
+            Model Comparison
+          </div>
+
+          <div class="card-body">
+            <p class="text-muted">
+              The table compares several regression models using the same
+              training and test split. The best model is selected by the lowest
+              Mean Absolute Error.
+            </p>
+
+            <div class="table-responsive">
+              <table class="table table-hover align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>Model</th>
+                    <th>R2 Score</th>
+                    <th>Mean Absolute Error</th>
+                    <th>RMSE</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {% for model in results.model_comparison %}
+                    <tr>
+                      <td class="fw-semibold">{{ model.name }}</td>
+                      <td>{{ model.r2_score }}</td>
+                      <td>{{ model.mean_absolute_error }}</td>
+                      <td>{{ model.root_mean_squared_error }}</td>
+                      <td>
+                        {% if model.is_best %}
+                          <span class="badge bg-success">Best model</span>
+                        {% else %}
+                          <span class="badge bg-secondary">Compared</span>
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+
+            <div class="alert alert-info mb-0">
+              <strong>Best model:</strong> {{ results.best_model }}
+            </div>
+          </div>
+        </div>
+
         <div class="card shadow-sm border-0 h-100">
           <div class="card-header bg-primary text-white">
             Model Overview
