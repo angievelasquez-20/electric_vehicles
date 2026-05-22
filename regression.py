@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
@@ -11,8 +12,10 @@ from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 from sklearn.tree import DecisionTreeRegressor
 
 CSV_PATH = "cvs/dataset.csv"
+
 PREDICTION_PLOT_PATH = "static/regression_predictions.png"
 RESIDUAL_PLOT_PATH = "static/regression_residuals.png"
+
 FEATURE_COLUMNS = [
     "Battery_Capacity_kWh",
     "State_of_Charge_%",
@@ -30,6 +33,7 @@ FEATURE_COLUMNS = [
     "Precipitation_mm",
     "Weekday"
 ]
+
 FEATURE_LABELS = {
     "Battery_Capacity_kWh": "Battery Capacity (kWh)",
     "State_of_Charge_%": "State of Charge (%)",
@@ -48,8 +52,18 @@ FEATURE_LABELS = {
     "Weekday": "Weekday"
 }
 
+SIMPLE_FEATURE_COLUMNS = [
+    "Battery_Capacity_kWh",
+    "State_of_Charge_%",
+    "Distance_to_Destination_km",
+    "Traffic_Data",
+    "Charging_Rate_kW",
+    "Queue_Time_mins"
+]
+
 
 def clean_number(value):
+
     value = str(value)
 
     if value.count(".") > 1:
@@ -58,11 +72,13 @@ def clean_number(value):
 
     try:
         return float(value)
+
     except ValueError:
         return None
 
 
-def create_regression_plots(y_test, predictions):
+def create_regression_plots(y_test, predictions, user_prediction=None):
+
     os.makedirs("static", exist_ok=True)
 
     plot_data = pd.DataFrame({
@@ -71,44 +87,117 @@ def create_regression_plots(y_test, predictions):
     }).sample(n=min(300, len(y_test)), random_state=42)
 
     plt.figure(figsize=(8, 5))
-    plt.scatter(plot_data["actual"], plot_data["predicted"], alpha=0.65, color="#0d6efd")
-    min_value = min(plot_data["actual"].min(), plot_data["predicted"].min())
-    max_value = max(plot_data["actual"].max(), plot_data["predicted"].max())
-    plt.plot([min_value, max_value], [min_value, max_value], color="#dc3545", linewidth=2)
+
+    plt.scatter(
+        plot_data["actual"],
+        plot_data["predicted"],
+        alpha=0.65,
+        color="#0d6efd"
+    )
+
+    min_value = min(
+        plot_data["actual"].min(),
+        plot_data["predicted"].min()
+    )
+
+    max_value = max(
+        plot_data["actual"].max(),
+        plot_data["predicted"].max()
+    )
+
+    if user_prediction is not None:
+        min_value = min(min_value, user_prediction)
+        max_value = max(max_value, user_prediction)
+
+    plt.plot(
+        [min_value, max_value],
+        [min_value, max_value],
+        color="#dc3545",
+        linewidth=2,
+        label="Ideal prediction line"
+    )
+
+    if user_prediction is not None:
+        plt.scatter(
+            [user_prediction],
+            [user_prediction],
+            color="#ffc107",
+            edgecolor="#dc3545",
+            linewidth=1.8,
+            s=260,
+            marker="*",
+            label="Your prediction",
+            zorder=5
+        )
+
+        plt.annotate(
+            f"Your prediction: {user_prediction:.2f} kWh",
+            xy=(user_prediction, user_prediction),
+            xytext=(12, 12),
+            textcoords="offset points",
+            fontsize=9,
+            color="#212529",
+            bbox={"boxstyle": "round,pad=0.3", "fc": "#fff3cd", "ec": "#dc3545", "lw": 1}
+        )
+
+    plt.legend(loc="best")
+
     plt.title("Actual vs Predicted Energy Drawn")
     plt.xlabel("Actual Energy Drawn (kWh)")
     plt.ylabel("Predicted Energy Drawn (kWh)")
+
     plt.tight_layout()
     plt.savefig(PREDICTION_PLOT_PATH)
     plt.close()
 
     residuals = y_test - predictions
-    residual_sample = pd.Series(residuals).sample(n=min(300, len(residuals)), random_state=42)
+
+    residual_sample = pd.Series(residuals).sample(
+        n=min(300, len(residuals)),
+        random_state=42
+    )
 
     plt.figure(figsize=(8, 5))
-    plt.scatter(range(len(residual_sample)), residual_sample, alpha=0.65, color="#198754")
-    plt.axhline(y=0, color="#dc3545", linewidth=2)
+
+    plt.scatter(
+        range(len(residual_sample)),
+        residual_sample,
+        alpha=0.65,
+        color="#198754"
+    )
+
+    plt.axhline(
+        y=0,
+        color="#dc3545",
+        linewidth=2
+    )
+
     plt.title("Regression Residual Errors")
     plt.xlabel("Sample")
     plt.ylabel("Actual - Predicted")
+
     plt.tight_layout()
     plt.savefig(RESIDUAL_PLOT_PATH)
     plt.close()
 
 
 def evaluate_regression_models(X_train, X_test, y_train, y_test):
+
     models = {
         "Linear Regression": LinearRegression(),
+
         "Decision Tree Regressor": DecisionTreeRegressor(
             max_depth=10,
             random_state=42
         ),
+
         "Random Forest Regressor": RandomForestRegressor(
             n_estimators=50,
             max_depth=10,
             random_state=42,
             n_jobs=-1
         ),
+
         "Gradient Boosting Regressor": GradientBoostingRegressor(
             random_state=42
         )
@@ -118,14 +207,18 @@ def evaluate_regression_models(X_train, X_test, y_train, y_test):
     trained_models = {}
 
     for model_name, model in models.items():
+
         model.fit(X_train, y_train)
+
         predictions = model.predict(X_test)
 
         comparison.append({
             "name": model_name,
             "r2_score": round(r2_score(y_test, predictions), 4),
             "mean_absolute_error": round(mean_absolute_error(y_test, predictions), 4),
-            "root_mean_squared_error": float(round(np.sqrt(mean_squared_error(y_test, predictions)), 4))
+            "root_mean_squared_error": float(
+                round(np.sqrt(mean_squared_error(y_test, predictions)), 4)
+            )
         })
 
         trained_models[model_name] = {
@@ -146,37 +239,58 @@ def evaluate_regression_models(X_train, X_test, y_train, y_test):
     return comparison, trained_models, best_model_name
 
 
-def build_prediction_inputs(df):
-    inputs = []
+def build_prediction_defaults(df):
+
+    defaults = {}
 
     for column in FEATURE_COLUMNS:
+        defaults[column] = round(float(df[column].median()), 4)
+
+    return defaults
+
+
+def build_prediction_inputs(df):
+
+    defaults = build_prediction_defaults(df)
+    inputs = []
+
+    for column in SIMPLE_FEATURE_COLUMNS:
         inputs.append({
             "name": column,
             "label": FEATURE_LABELS[column],
-            "value": round(float(df[column].median()), 4)
+            "value": defaults[column]
         })
 
     return inputs
 
 
-def predict_energy_drawn(model, form_data):
+def predict_energy_drawn(model, form_data, default_values=None):
+
+    default_values = default_values or {}
     input_values = {}
 
     for column in FEATURE_COLUMNS:
-        value = clean_number(form_data.get(column))
+
+        raw_value = form_data.get(column, default_values.get(column))
+        value = clean_number(raw_value)
 
         if value is None:
             raise ValueError(f"Invalid value for {FEATURE_LABELS[column]}")
 
         input_values[column] = value
 
-    input_df = pd.DataFrame([input_values], columns=FEATURE_COLUMNS)
+    input_df = pd.DataFrame(
+        [input_values],
+        columns=FEATURE_COLUMNS
+    )
+
     prediction = model.predict(input_df)[0]
 
     return round(float(prediction), 4), input_values
 
 
 def train_regression_model():
+
     df = pd.read_csv(CSV_PATH, sep=";")
 
     target_column = "Energy_Drawn_kWh"
@@ -191,9 +305,11 @@ def train_regression_model():
     df = df.dropna(subset=numeric_columns)
 
     clean_records = len(df)
+
     removed_records = original_records - clean_records
 
     X = df[FEATURE_COLUMNS]
+
     y = df[target_column]
 
     X_train, X_test, y_train, y_test = train_test_split(
@@ -211,8 +327,8 @@ def train_regression_model():
     )
 
     model = trained_models["Linear Regression"]["model"]
+
     predictions = trained_models["Linear Regression"]["predictions"]
-    create_regression_plots(y_test, predictions)
 
     r2 = round(r2_score(y_test, predictions), 4)
 
@@ -229,8 +345,13 @@ def train_regression_model():
         "best_model": best_model_name,
         "model_comparison": model_comparison,
         "feature_inputs": build_prediction_inputs(df),
+        "prediction_defaults": build_prediction_defaults(df),
         "prediction_plot": "regression_predictions.png",
-        "residual_plot": "regression_residuals.png"
+        "residual_plot": "regression_residuals.png",
+
+        # IMPORTANT
+        "y_test": y_test,
+        "predictions": predictions
     }
 
     return model, results
