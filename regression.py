@@ -1,11 +1,14 @@
 import pandas as pd
 import os
+import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import r2_score, mean_absolute_error
+from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
+from sklearn.tree import DecisionTreeRegressor
 
 CSV_PATH = "cvs/dataset.csv"
 PREDICTION_PLOT_PATH = "static/regression_predictions.png"
@@ -59,6 +62,56 @@ def create_regression_plots(y_test, predictions):
     plt.close()
 
 
+def evaluate_regression_models(X_train, X_test, y_train, y_test):
+    models = {
+        "Linear Regression": LinearRegression(),
+        "Decision Tree Regressor": DecisionTreeRegressor(
+            max_depth=10,
+            random_state=42
+        ),
+        "Random Forest Regressor": RandomForestRegressor(
+            n_estimators=50,
+            max_depth=10,
+            random_state=42,
+            n_jobs=-1
+        ),
+        "Gradient Boosting Regressor": GradientBoostingRegressor(
+            random_state=42
+        )
+    }
+
+    comparison = []
+    trained_models = {}
+
+    for model_name, model in models.items():
+        model.fit(X_train, y_train)
+        predictions = model.predict(X_test)
+
+        comparison.append({
+            "name": model_name,
+            "r2_score": round(r2_score(y_test, predictions), 4),
+            "mean_absolute_error": round(mean_absolute_error(y_test, predictions), 4),
+            "root_mean_squared_error": float(round(np.sqrt(mean_squared_error(y_test, predictions)), 4))
+        })
+
+        trained_models[model_name] = {
+            "model": model,
+            "predictions": predictions
+        }
+
+    comparison = sorted(
+        comparison,
+        key=lambda item: item["mean_absolute_error"]
+    )
+
+    best_model_name = comparison[0]["name"]
+
+    for item in comparison:
+        item["is_best"] = item["name"] == best_model_name
+
+    return comparison, trained_models, best_model_name
+
+
 def train_regression_model():
     df = pd.read_csv(CSV_PATH, sep=";")
 
@@ -104,10 +157,15 @@ def train_regression_model():
         random_state=42
     )
 
-    model = LinearRegression()
-    model.fit(X_train, y_train)
+    model_comparison, trained_models, best_model_name = evaluate_regression_models(
+        X_train,
+        X_test,
+        y_train,
+        y_test
+    )
 
-    predictions = model.predict(X_test)
+    model = trained_models["Linear Regression"]["model"]
+    predictions = trained_models["Linear Regression"]["predictions"]
     create_regression_plots(y_test, predictions)
 
     r2 = round(r2_score(y_test, predictions), 4)
@@ -122,6 +180,8 @@ def train_regression_model():
         "removed_records": removed_records,
         "r2_score": r2,
         "mean_absolute_error": round(mean_absolute_error(y_test, predictions), 4),
+        "best_model": best_model_name,
+        "model_comparison": model_comparison,
         "prediction_plot": "regression_predictions.png",
         "residual_plot": "regression_residuals.png"
     }
