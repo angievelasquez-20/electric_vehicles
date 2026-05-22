@@ -4,3 +4,5 @@ scikit-learn
 folium
 gunicorn
 Flask-Session
+ldap3
+matplotlib
