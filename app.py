@@ -1,7 +1,13 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session, redirect, url_for, flash
+from flask_session import Session
 import logic
 from regression import train_regression_model
+import auth_ad
+from kmeans import applyClusteringKmeans, generate_plot
 import os
+import shutil
+import signal
+import atexit
 
 app = Flask(__name__)
 app.secret_key = 'tu_clave_secreta_para_sesiones' # Required for using sessions
@@ -12,7 +18,7 @@ SESSION_DIR = os.path.join(os.path.dirname(__file__), 'session_files')
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_FILE_DIR'] = SESSION_DIR
 app.config['SESSION_PERMANENT'] = False
-FlaskSession(app)
+Session(app)
 
 # Ensure session files are removed when the program terminates
 def _clear_session_files():
@@ -122,13 +128,13 @@ def K_means():
 
         k = int(request.form['k'])
 
-        info = Clustering.applyClusteringKmeans(k)
+        info = applyClusteringKmeans(k)
 
         results = info["results"]
         summaryClusters = info["summaryClusters"]
         centers = info["centers"]
 
-        Clustering.generate_plot(results, centers)
+        generate_plot(results, centers)
 
         plot_url = 'kmeans_plot.png'
 
