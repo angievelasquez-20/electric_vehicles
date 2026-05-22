@@ -2,12 +2,6 @@ from flask import Flask, render_template, request
 import logic
 from regression import train_regression_model
 import os
-import atexit
-import shutil
-import signal
-import auth_ad
-from flask import session, redirect, url_for, flash
-from flask_session import Session as FlaskSession
 
 app = Flask(__name__)
 app.secret_key = 'tu_clave_secreta_para_sesiones' # Required for using sessions
@@ -113,6 +107,38 @@ def optimizer():
 def logout():
     session.pop('user', None)
     return redirect(url_for('login'))
+
+
+
+@app.route('/K_means', methods=['GET', 'POST'])
+def K_means():
+
+    results = None
+    summaryClusters = None
+    centers = None
+    plot_url = None
+
+    if request.method == 'POST':
+
+        k = int(request.form['k'])
+
+        info = Clustering.applyClusteringKmeans(k)
+
+        results = info["results"]
+        summaryClusters = info["summaryClusters"]
+        centers = info["centers"]
+
+        Clustering.generate_plot(results, centers)
+
+        plot_url = 'kmeans_plot.png'
+
+    return render_template(
+        'k_means.html',
+        results=results,
+        summaryClusters=summaryClusters,
+        centers=centers,
+        plot_url=plot_url
+    )
 
 
 if __name__ == "__main__":
