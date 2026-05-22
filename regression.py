@@ -13,6 +13,40 @@ from sklearn.tree import DecisionTreeRegressor
 CSV_PATH = "cvs/dataset.csv"
 PREDICTION_PLOT_PATH = "static/regression_predictions.png"
 RESIDUAL_PLOT_PATH = "static/regression_residuals.png"
+FEATURE_COLUMNS = [
+    "Battery_Capacity_kWh",
+    "State_of_Charge_%",
+    "Energy_Consumption_Rate_kWh/km",
+    "Distance_to_Destination_km",
+    "Traffic_Data",
+    "Charging_Rate_kW",
+    "Queue_Time_mins",
+    "Station_Capacity_EV",
+    "Time_Spent_Charging_mins",
+    "Session_Start_Hour",
+    "Fleet_Size",
+    "Temperature_C",
+    "Wind_Speed_m/s",
+    "Precipitation_mm",
+    "Weekday"
+]
+FEATURE_LABELS = {
+    "Battery_Capacity_kWh": "Battery Capacity (kWh)",
+    "State_of_Charge_%": "State of Charge (%)",
+    "Energy_Consumption_Rate_kWh/km": "Energy Consumption Rate (kWh/km)",
+    "Distance_to_Destination_km": "Distance to Destination (km)",
+    "Traffic_Data": "Traffic Data",
+    "Charging_Rate_kW": "Charging Rate (kW)",
+    "Queue_Time_mins": "Queue Time (mins)",
+    "Station_Capacity_EV": "Station Capacity (EV)",
+    "Time_Spent_Charging_mins": "Time Spent Charging (mins)",
+    "Session_Start_Hour": "Session Start Hour",
+    "Fleet_Size": "Fleet Size",
+    "Temperature_C": "Temperature (C)",
+    "Wind_Speed_m/s": "Wind Speed (m/s)",
+    "Precipitation_mm": "Precipitation (mm)",
+    "Weekday": "Weekday"
+}
 
 
 def clean_number(value):
@@ -112,30 +146,42 @@ def evaluate_regression_models(X_train, X_test, y_train, y_test):
     return comparison, trained_models, best_model_name
 
 
+def build_prediction_inputs(df):
+    inputs = []
+
+    for column in FEATURE_COLUMNS:
+        inputs.append({
+            "name": column,
+            "label": FEATURE_LABELS[column],
+            "value": round(float(df[column].median()), 4)
+        })
+
+    return inputs
+
+
+def predict_energy_drawn(model, form_data):
+    input_values = {}
+
+    for column in FEATURE_COLUMNS:
+        value = clean_number(form_data.get(column))
+
+        if value is None:
+            raise ValueError(f"Invalid value for {FEATURE_LABELS[column]}")
+
+        input_values[column] = value
+
+    input_df = pd.DataFrame([input_values], columns=FEATURE_COLUMNS)
+    prediction = model.predict(input_df)[0]
+
+    return round(float(prediction), 4), input_values
+
+
 def train_regression_model():
     df = pd.read_csv(CSV_PATH, sep=";")
 
-    feature_columns = [
-        "Battery_Capacity_kWh",
-        "State_of_Charge_%",
-        "Energy_Consumption_Rate_kWh/km",
-        "Distance_to_Destination_km",
-        "Traffic_Data",
-        "Charging_Rate_kW",
-        "Queue_Time_mins",
-        "Station_Capacity_EV",
-        "Time_Spent_Charging_mins",
-        "Session_Start_Hour",
-        "Fleet_Size",
-        "Temperature_C",
-        "Wind_Speed_m/s",
-        "Precipitation_mm",
-        "Weekday"
-    ]
-
     target_column = "Energy_Drawn_kWh"
 
-    numeric_columns = feature_columns + [target_column]
+    numeric_columns = FEATURE_COLUMNS + [target_column]
 
     original_records = len(df)
 
@@ -147,7 +193,7 @@ def train_regression_model():
     clean_records = len(df)
     removed_records = original_records - clean_records
 
-    X = df[feature_columns]
+    X = df[FEATURE_COLUMNS]
     y = df[target_column]
 
     X_train, X_test, y_train, y_test = train_test_split(
@@ -182,6 +228,7 @@ def train_regression_model():
         "mean_absolute_error": round(mean_absolute_error(y_test, predictions), 4),
         "best_model": best_model_name,
         "model_comparison": model_comparison,
+        "feature_inputs": build_prediction_inputs(df),
         "prediction_plot": "regression_predictions.png",
         "residual_plot": "regression_residuals.png"
     }

@@ -9,7 +9,7 @@ from flask_session import Session
 import auth_ad
 import logic
 from kmeans import applyClusteringKmeans, generate_plot
-from regression import train_regression_model
+from regression import predict_energy_drawn, train_regression_model
 
 app = Flask(__name__)
 app.secret_key = 'tu_clave_secreta_para_sesiones' # Required for using sessions
@@ -67,14 +67,24 @@ def recommend():
             return f"Error: {str(e)}", 500
     return render_template('index.html')
 
-@app.route('/regression')
+@app.route('/regression', methods=['GET', 'POST'])
 def regression():
     try:
         model, results = train_regression_model()
+        prediction = None
+        prediction_inputs = None
+
+        if request.method == 'POST':
+            prediction, prediction_inputs = predict_energy_drawn(
+                model,
+                request.form
+            )
 
         return render_template(
             'regression.html',
-            results=results
+            results=results,
+            prediction=prediction,
+            prediction_inputs=prediction_inputs
         )
 
     except Exception as e:
