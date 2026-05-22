@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>EV Optimizer Colombia</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="text-center mt-3">
+    <div class="dropdown d-inline-block">
+      <button class="btn btn-primary dropdown-toggle px-4 py-2 shadow" type="button" id="mainMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+        Menu
+      </button>
+      <ul class="dropdown-menu shadow-lg border-0" aria-labelledby="mainMenuButton">
+        <li><a class="dropdown-item" href="/presentation">Presentation</a></li>
+        <li><a class="dropdown-item" href="/recommend">Recommend</a></li>
+        <li><a class="dropdown-item" href="/regression">Regression</a></li>
+        <li><a class="dropdown-item" href="/login">Login</a></li>
+      </ul>
+    </div>
+  </div>
+
+<div class="container mt-5">
+    <h2>Recommendation System Configuration</h2>
+    <form action="/recommend" method="post" class="card p-4 shadow-sm">
+        <label class="form-label">Number of stations to install:</label>
+        <input type="number" name="n_stations" class="form-control" value="5" min="1" max="20">
+        <button type="submit" class="btn btn-primary mt-3">Calculate optimal locations</button>
+    </form>
+    <a href="/presentation" class="btn btn-secondary mt-3">Back</a>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
