@@ -326,13 +326,19 @@
             <div class="text-center mt-5">
 
                 <button
-                    onclick="window.location.href='/recommend'"
+                    onclick="window.location.href='/home'"
                     class="btn btn-primary"
                 >
                     Back Home
                 </button>
                  <button
                     onclick="window.location.href='{{ url_for('regression') }}'"
+                    class="btn btn-primary"
+                >
+                    Back
+                </button>
+                 <button
+                    onclick="window.location.href='{{ url_for('home') }}'"
                     class="btn btn-primary"
                 >
                     Next
