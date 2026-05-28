@@ -1,13 +1,15 @@
-from flask import Flask, render_template, request, session, redirect, url_for, flash
-from flask_session import Session
-import logic
-from regression import train_regression_model
-import auth_ad
-from kmeans import applyClusteringKmeans, generate_plot
 import os
 import shutil
 import signal
 import atexit
+
+from flask import Flask, flash, redirect, render_template, request, session, url_for
+from flask_session import Session
+
+import auth_ad
+import logic
+from kmeans import applyClusteringKmeans, generate_plot
+from regression import create_regression_plots, predict_energy_drawn, train_regression_model
 
 app = Flask(__name__)
 app.secret_key = 'tu_clave_secreta_para_sesiones' # Required for using sessions
@@ -46,9 +48,27 @@ for _signal in (signal.SIGINT, signal.SIGTERM):
 def home():
     return render_template('home.html')
 
-@app.route('/index')
+def _render_recommendation_page():
+    n_stations = int(request.form.get('n_stations', 5))
+    stations, map_html = logic.process_locations('cvs/dataset.csv', n_stations)
+
+    return render_template(
+        'index.html',
+        map=map_html,
+        stations=stations,
+        n_stations=n_stations,
+        has_prediction=True
+    )
+
+@app.route('/index', methods=['GET', 'POST'])
 def index():
-    return render_template('index.html')
+    if request.method == 'POST':
+        try:
+            return _render_recommendation_page()
+        except Exception as e:
+            return f"Error: {str(e)}", 500
+
+    return render_template('index.html', n_stations=5)
 
 @app.route('/presentation')
 def presentation():
@@ -58,21 +78,44 @@ def presentation():
 def recommend():
     if request.method == 'POST':
         try:
-            n_stations = int(request.form.get('n_stations', 5))
-            stations, map_html = logic.process_locations('cvs/dataset.csv', n_stations)
-            return render_template('map.html', map=map_html, stations=stations)
+            return _render_recommendation_page()
         except Exception as e:
             return f"Error: {str(e)}", 500
-    return render_template('index.html')
 
-@app.route('/regression')
+    return render_template('index.html', n_stations=5)
+
+@app.route('/regression', methods=['GET', 'POST'])
 def regression():
     try:
         model, results = train_regression_model()
 
+        prediction = None
+        prediction_inputs = None
+        show_graphs = False
+
+        if request.method == 'POST':
+
+            prediction, prediction_inputs = predict_energy_drawn(
+                model,
+                request.form,
+                results["prediction_defaults"]
+            )
+
+            # Generate charts ONLY after prediction
+            create_regression_plots(
+                results["y_test"],
+                results["predictions"],
+                prediction
+            )
+
+            show_graphs = True
+
         return render_template(
             'regression.html',
-            results=results
+            results=results,
+            prediction=prediction,
+            prediction_inputs=prediction_inputs,
+            show_graphs=show_graphs
         )
 
     except Exception as e:
@@ -83,7 +126,7 @@ def regression():
 def login():
     # If already logged in, go directly to the optimizer
     if 'user' in session:
-        return redirect(url_for('optimizer'))
+        return redirect(url_for('presentation'))
     return render_template('login.html')
 
 @app.route('/login_process', methods=['POST'])
@@ -95,7 +138,7 @@ def login_process():
     if auth_ad.authenticate_ad_user(username, password):
         session.permanent = False
         session['user'] = username  # store the session
-        return redirect(url_for('optimizer'))
+        return redirect(url_for('presentation'))
     else:
         flash('Active Directory credentials are incorrect or server unavailable.', 'danger')
         return redirect(url_for('login'))

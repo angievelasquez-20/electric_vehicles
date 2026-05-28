@@ -1,19 +1,64 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>EV Optimizer Colombia</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/
-bootstrap.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EV Optimizer Colombia</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
-<body class="container mt-5">
-<h2>Recommendation System Configuration</h2>
-<form action="/Recommend" method="post" class="card p-4 shadow-sm">
-<label class="form-label">Number of stations to be installed:</label>
-<input type="number" name="n_estaciones" class="form-control" value="5" min="1"
-max="20">
+<body class="bg-light">
+  <main class="container-fluid py-5 px-4">
+    <section class="mx-auto" style="max-width: 1320px;">
+      <h2 class="mb-3">Recommendation System Configuration</h2>
 
-<button type="submit" class="btn btn-primary mt-3">Calculate Optimal Locations</button>
-</form>
-<a href="/presentation" class="btn btn-secondary mt-3">Back</a>
+      <form action="/index" method="post" class="card p-4 shadow-sm mb-4">
+        <label class="form-label">Number of stations to be installed:</label>
+        <input
+          type="number"
+          name="n_stations"
+          class="form-control"
+          value="{{ n_stations|default(5) }}"
+          min="1"
+          max="20"
+        >
+
+        <div class="d-flex flex-wrap gap-2 mt-3">
+          <a href="/presentation" class="btn btn-secondary">Back</a>
+          <button type="submit" class="btn btn-primary">Predict</button>
+          {% if has_prediction %}
+            <a href="/regression" class="btn btn-outline-primary">Next</a>
+          {% endif %}
+        </div>
+      </form>
+
+      {% if has_prediction %}
+        <div class="row g-4 align-items-start">
+          <section class="col-lg-8">
+            <div class="bg-white border rounded shadow-sm overflow-hidden">
+              {{ map|safe }}
+            </div>
+          </section>
+
+          <aside class="col-lg-4">
+            <div class="card shadow-sm">
+              <div class="card-header bg-dark text-white">
+                Prediction Results
+              </div>
+
+              <ul class="list-group list-group-flush">
+                {% for lat, lon in stations %}
+                  <li class="list-group-item">
+                    <strong>Lat:</strong> {{ lat|round(4) }}
+                    <span class="text-muted">|</span>
+                    <strong>Lon:</strong> {{ lon|round(4) }}
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </aside>
+        </div>
+      {% endif %}
+    </section>
+  </main>
 </body>
 </html>
