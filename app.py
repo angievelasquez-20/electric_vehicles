@@ -2,10 +2,8 @@ import os
 import shutil
 import signal
 import atexit
-
 from flask import Flask, flash, redirect, render_template, request, session, url_for
 from flask_session import Session
-
 import auth_ad
 import logic
 from kmeans import applyClusteringKmeans, generate_plot
@@ -44,7 +42,7 @@ def _shutdown_handler(signum, frame):
 for _signal in (signal.SIGINT, signal.SIGTERM):
     signal.signal(_signal, _shutdown_handler)
 
-@app.route('/')
+@app.route('/home')
 def home():
     return render_template('home.html')
 
@@ -85,6 +83,7 @@ def recommend():
     return render_template('index.html', n_stations=5)
 
 @app.route('/regression', methods=['GET', 'POST'])
+@app.route('/regression/', methods=['GET', 'POST'])
 def regression():
     try:
         model, results = train_regression_model()
@@ -122,11 +121,11 @@ def regression():
         return f"Linear regression error: {str(e)}", 500
     
 
-@app.route('/login')
+@app.route('/')
 def login():
-    # If already logged in, go directly to the optimizer
+    # If already logged in, go directly to the home page
     if 'user' in session:
-        return redirect(url_for('presentation'))
+        return redirect(url_for('home'))
     return render_template('login.html')
 
 @app.route('/login_process', methods=['POST'])
@@ -138,7 +137,7 @@ def login_process():
     if auth_ad.authenticate_ad_user(username, password):
         session.permanent = False
         session['user'] = username  # store the session
-        return redirect(url_for('presentation'))
+        return redirect(url_for('home'))
     else:
         flash('Active Directory credentials are incorrect or server unavailable.', 'danger')
         return redirect(url_for('login'))

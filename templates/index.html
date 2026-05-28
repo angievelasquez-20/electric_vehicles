@@ -26,7 +26,7 @@
           <a href="/presentation" class="btn btn-secondary">Back</a>
           <button type="submit" class="btn btn-primary">Predict</button>
           {% if has_prediction %}
-            <a href="/regression" class="btn btn-outline-primary">Next</a>
+            <a href="{{ url_for('regression') }}" class="btn btn-outline-primary">Next</a>
           {% endif %}
         </div>
       </form>

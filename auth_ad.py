@@ -1,4 +1,6 @@
 from ldap3 import Server, Connection, ALL, SIMPLE
+import auth_ad
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 
 # Configuración del servidor Windows Server
 LDAP_SERVER = '192.168.1.100'  # Cambia por la IP de tu Windows Server / Domain Controller
@@ -6,7 +8,7 @@ DOMAIN_SUFFIX = '@lab.local'  # Active Directory domain suffix
 
 def authenticate_ad_user(username, password):
     # --- LOCAL TEST MODE (for when the Windows Server is offline) ---
-    if username == "admin.test" and password == "Machine123":
+    if username == 'admin.test' and password == 'Machine123':
         print("Access granted using local test user.")
         return True
     # -----------------------------------------------------------------

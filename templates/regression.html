@@ -12,8 +12,8 @@
     <div class="container">
       <a class="navbar-brand" href="/">EV Charging Stations Colombia</a>
       <div class="navbar-nav ms-auto">
-        <a class="nav-link" href="/index">Recommendation</a>
-        <a class="nav-link active" href="/regression">Energy Predict</a>
+        <a class="nav-link" href="{{ url_for('index') }}">Recommendation</a>
+        <a class="nav-link active" href="{{ url_for('regression') }}">Energy Predict</a>
       </div>
     </div>
   </nav>
@@ -54,7 +54,7 @@
     <div class="card shadow-sm border-0 mb-4">
       <div class="card-header bg-dark text-white">Prediction Form</div>
       <div class="card-body">
-        <form action="/regression" method="post">
+        <form action="{{ url_for('regression') }}" method="post">
           <div class="row g-3">
             {% for field in results.feature_inputs %}
               <div class="col-lg-4 col-md-6">
