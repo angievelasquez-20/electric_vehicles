@@ -83,7 +83,6 @@ def recommend():
     return render_template('index.html', n_stations=5)
 
 @app.route('/regression', methods=['GET', 'POST'])
-@app.route('/regression/', methods=['GET', 'POST'])
 def regression():
     try:
         model, results = train_regression_model()
